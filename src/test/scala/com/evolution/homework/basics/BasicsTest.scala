@@ -8,6 +8,12 @@ import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
 class BasicsTest extends AnyFlatSpec with ScalaCheckDrivenPropertyChecks {
 
+  "lcm(0, 1)" should "throw exception" in {
+    assertThrows[UnsupportedOperationException] {
+      lcm(0, 1)
+    }
+  }
+
   "lcm(7919, 7907)" should "be 62615533" in {
     lcm(7919, 7907) shouldEqual 62615533
   }
