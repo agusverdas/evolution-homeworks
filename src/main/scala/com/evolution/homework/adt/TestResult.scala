@@ -1,6 +1,6 @@
 package com.evolution.homework.adt
 
-sealed case class TestResult(list: List[Combination]) {
+sealed abstract case class TestResult private(list: List[Combination]) {
   private val sortedCombinations: List[Combination] = ??? // Here need to Ordering class to be implemented and call list.sorted
 
   // For printing it should be like this (Again need Ordering)
@@ -10,4 +10,10 @@ sealed case class TestResult(list: List[Combination]) {
       case ((prev, string), cur) => if (prev == cur) (cur, string + "=" + cur) else (cur, string + " " + cur)
     }
   }*/
+}
+
+object TestResult {
+  def apply(list: List[Combination]): Option[TestResult] = {
+    Option.when(list.nonEmpty)(new TestResult(list) {})
+  }
 }
