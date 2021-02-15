@@ -1,7 +1,6 @@
 package com.evolution.homework.basics
 
 import com.evolution.homework.basics.Basics.{gcd, lcm}
-
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks

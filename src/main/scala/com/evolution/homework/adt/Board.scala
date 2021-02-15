@@ -8,10 +8,4 @@ object Board extends {
     val predicate = list.length == Hand.BoardSize && Hand.validateCardsOfSameRank(list) && Hand.isHandUnique(list)
     Option.when(predicate)(new Board(list) {})
   }
-  def apply(first: Card, second: Card, third: Card, fourth: Card, fifth: Card): Option[Board] = {
-    apply(first :: second :: third :: fourth :: fifth :: Nil)
-  }
-  def apply(five: (Card, Card, Card, Card, Card)): Option[Board] = {
-    apply(five._1, five._2, five._3, five._4, five._5)
-  }
 }

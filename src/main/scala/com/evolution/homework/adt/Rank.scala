@@ -3,6 +3,28 @@ package com.evolution.homework.adt
 sealed trait Rank {
   def value: String
 }
+
+object Rank {
+  def apply(rank: String): Option[Rank] = {
+    rank match {
+      case "2" => Some(Two)
+      case "3" => Some(Three)
+      case "4" => Some(Four)
+      case "5" => Some(Five)
+      case "6" => Some(Six)
+      case "7" => Some(Seven)
+      case "8" => Some(Eight)
+      case "9" => Some(Nine)
+      case "10" => Some(Ten)
+      case "J" => Some(Jack)
+      case "Q" => Some(Queen)
+      case "K" => Some(King)
+      case "A" => Some(Ace)
+      case _ => None
+    }
+  }
+}
+
 case object Two extends Rank {
   override val value: String = "2"
 }
