@@ -7,7 +7,6 @@ import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
 class BasicsTest extends AnyFlatSpec with ScalaCheckDrivenPropertyChecks {
-
   "lcm(0, 1)" should "throw exception" in {
     assertThrows[UnsupportedOperationException] {
       lcm(0, 1)
