@@ -18,17 +18,16 @@ object BulkySourcesPlugin extends AutoPlugin {
   )
 
   override val projectSettings: Seq[Setting[_]] = Seq(
-    bulkySources := {
-      val compileFiles = (Compile / sources).value
-      val testCompileFiles = (Test / sources).value
-      val result = compileFiles ++ testCompileFiles
-      result.map { file =>
-        val lines = sbt.IO.readLines(file).size
-        (lines, file)
-      }.filter { case (lines, _) => lines >= bulkyThresholdInLines.value }.sortBy {
-        case (l, _) => l
-      }(Ordering[Int].reverse)
-    })
+    bulkySources := lines((Compile / sources).value, bulkyThresholdInLines.value),
+    (Test / bulkySources) := lines((Test / sources).value, bulkyThresholdInLines.value)
+  )
 
-
+  def lines(files: Seq[File], threshold: Int): Seq[(Int, File)] = {
+    files.map { file =>
+      val lines = sbt.IO.readLines(file).size
+      (lines, file)
+    }.filter { case (lines, _) => lines >=  threshold}.sortBy {
+      case (l, _) => l
+    }(Ordering[Int].reverse)
+  }
 }
