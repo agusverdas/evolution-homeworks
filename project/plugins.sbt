@@ -1,0 +1,1 @@
+addSbtPlugin("com.evolution" % "plugin" % "0.1")

@@ -13,3 +13,14 @@ libraryDependencies ++= Seq(
   "org.scalatestplus" %% "selenium-2-45" % scalaTestVersion % Test,
   "io.chrisdavenport" %% "cats-scalacheck" % catsScalacheckVersion % Test,
 )
+
+lazy val root = (project in file("."))
+
+lazy val plugin = (project in file("sbt-plugin"))
+  .enablePlugins(SbtPlugin)
+  .settings(
+    name := "plugin",
+    scalaVersion := "2.12.13",
+    version := "0.1",
+    organization := "com.evolution"
+)
