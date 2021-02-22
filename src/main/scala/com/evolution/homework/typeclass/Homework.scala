@@ -75,6 +75,7 @@ object AdvancedHomework {
 
   implicit class MonadSyntax[F[_], A](i: F[A]) {
     def >>=[B](kleisli: A => F[B])(implicit monad: Monad[F]): F[B] = monad.flatMap(i)(kleisli)
+    def flatMap[B](kleisli: A => F[B])(implicit monad: Monad[F]): F[B] = monad.flatMap(i)(kleisli)
   }
 
   case class Identity[T](x : T)
@@ -83,6 +84,7 @@ object AdvancedHomework {
   }
   def mul2: Int => Identity[Int] = (x: Int) => Identity(x * 2)
   Identity(1) >>= mul2
+  Identity(1).flatMap(mul2)
 }
 
 
