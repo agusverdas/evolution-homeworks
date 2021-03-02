@@ -62,7 +62,7 @@ object Task4 {
   implicit val eqString: Eq[String] = _.equals(_)
 
   implicit class RichEq[T](x : T) {
-    def ===(y: T)(implicit eq: Eq[T]): Boolean = x === y
+    def ===(y: T)(implicit eq: Eq[T]): Boolean = eq.===(x, y)
   }
 }
 
