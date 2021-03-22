@@ -37,3 +37,5 @@ lazy val plugin = (project in file("sbt-plugin"))
     version := "0.1",
     organization := "com.evolution"
 )
+
+addCompilerPlugin("org.typelevel" %% "kind-projector" % "0.11.1" cross CrossVersion.full)
