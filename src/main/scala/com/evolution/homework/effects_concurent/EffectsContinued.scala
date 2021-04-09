@@ -46,10 +46,6 @@ import scala.io.StdIn
   }
  */
 object EffectsContinued extends IOApp{
-
-  sealed trait ValidationError
-  final case class EmptyFile(filename: String) extends ValidationError
-  final case class NotPositiveInt(number: Int) extends ValidationError
   val defaultBlocker: Blocker = Blocker.liftExecutionContext(ExecutionContext.fromExecutor(Executors.newCachedThreadPool()))
 
   def readFilePath(blocker: Blocker)(implicit contextShift: ContextShift[IO], sync: Sync[IO]): IO[String] = blocker.delay{
