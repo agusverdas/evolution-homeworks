@@ -33,8 +33,8 @@ object SharedStateHomework extends IOApp {
       val optionT: OptionT[F, V] = for {
         map <- OptionT.liftF(state.get)
         (time, value) <- OptionT(Monad[F].pure(map.get(key)))
-        currentTime <- OptionT.liftF(Clock[F].realTime(unitsOfMeasure))
-        if time + expiresIn.toUnit(unitsOfMeasure).toLong >= currentTime
+//        currentTime <- OptionT.liftF(Clock[F].realTime(unitsOfMeasure))
+//        if time + expiresIn.toUnit(unitsOfMeasure).toLong >= currentTime
       } yield value
       optionT.value
     }
@@ -50,7 +50,7 @@ object SharedStateHomework extends IOApp {
         _ <- state.update { map =>
           map.filter { case (_, (timestamp, _)) =>
             val expirationTime = timestamp + expiresIn.toUnit(unitsOfMeasure).toLong
-            expirationTime <= currentTime
+            expirationTime >= currentTime
           }
         }
       } yield ()
