@@ -1,5 +1,7 @@
 package com.evolution.homework.effects
 
+import com.evolution.homework.effects.EffectsHomework1.IO.pure
+
 import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.util.{Failure, Success, Try}
 
@@ -27,14 +29,17 @@ import scala.util.{Failure, Success, Try}
  * Ask questions in the bootcamp chat if stuck on this task.
  */
 object EffectsHomework1 extends App {
-  final class IO[A](run: () => A) {
+  final class IO[A](private val run: () => A) {
     def map[B](f: A => B): IO[B] = new IO[B](() => f(run()))
-    def flatMap[B](f: A => IO[B]): IO[B] = f(run())
+    def flatMap[B](f: A => IO[B]): IO[B] = new IO[B](() => f(run()).run())
     def *>[B](another: IO[B]): IO[B] = flatMap(_ => another)
     def as[B](newValue: => B): IO[B] = map(_ => newValue)
     def void: IO[Unit] = new IO[Unit](() => run())
     def attempt: IO[Either[Throwable, A]] = new IO(() => Try(run()).toEither)
-    def option: IO[Option[A]] = new IO[Option[A]](() => Option(run()))
+    def option: IO[Option[A]] = attempt.flatMap {
+      case Left(_) => as(None)
+      case Right(x) => as(Some(x))
+    }
     def handleErrorWith[AA >: A](f: Throwable => IO[AA]): IO[AA] = attempt.flatMap(x => x.fold(f, x => as(x)))
     def redeem[B](recover: Throwable => B, map: A => B): IO[B] = attempt.flatMap(x => new IO(() => x.fold(recover, map)))
     def redeemWith[B](recover: Throwable => IO[B], bind: A => IO[B]): IO[B] = attempt.flatMap(x => x.fold(recover, bind))
@@ -44,7 +49,7 @@ object EffectsHomework1 extends App {
 
   object IO {
     def apply[A](body: => A): IO[A] = new IO(() => body)
-    def suspend[A](thunk: => IO[A]): IO[A] = thunk
+    def suspend[A](thunk: => IO[A]): IO[A] = unit.flatMap(_ => thunk)
     def delay[A](body: => A): IO[A] = apply(body)
     def pure[A](a: A): IO[A] = new IO(() => a)
     def fromEither[A](e: Either[Throwable, A]): IO[A] = e match {

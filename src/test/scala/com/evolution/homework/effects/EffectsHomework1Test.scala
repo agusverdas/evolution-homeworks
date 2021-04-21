@@ -114,4 +114,8 @@ class EffectsHomework1Test extends AnyFlatSpec with Matchers {
       mIO.unsafeRunSync()
     }
   }
+
+  "fromEsither" should "create IO" in {
+    IO(println("boom")).flatMap(_ => IO(123))
+  }
 }
