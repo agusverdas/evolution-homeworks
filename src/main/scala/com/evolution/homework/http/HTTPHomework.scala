@@ -1,5 +1,6 @@
 package com.evolution.homework.http
 
+import cats.data.Kleisli
 import cats.effect.concurrent.Ref
 import cats.effect.{ExitCode, IO, IOApp, Sync}
 import cats.syntax.all._
@@ -75,12 +76,11 @@ object GuessServer extends IOApp {
   import io.circe.generic.auto._
   import org.http4s.circe.CirceEntityCodec._
   val Session = "guessServerChatSession"
-  val sessionsIO: IO[SessionWarehouse[IO]] = SessionsWarehouse.of[IO]
   val CookieMaxAge: Option[Long] = Some(300L)
   val MaxTries = 5
   val random = new Random()
 
-  private val gameRoutes = HttpRoutes.of[IO] {
+  private def gameRoutes(sessions: SessionWarehouse[IO]): HttpRoutes[IO] = HttpRoutes.of[IO] {
     case req @ POST -> Root / "start" =>
       req.as[GameConditions].flatMap { conditions =>
         val sessionIDOpt: Option[String] = req.cookies.find(_.name == Session).map(_.content)
@@ -90,7 +90,6 @@ object GuessServer extends IOApp {
             for {
               uuid <- IO.pure(UUID.randomUUID())
               serverValue = random.between(conditions.min, conditions.max)
-              sessions <- sessionsIO
               _ <- sessions.put(new Session(uuid.toString, Game(conditions, MaxTries, serverValue)))
               ses <- sessions.get(uuid)
               _ <- IO(println(s"Session : ${ses}"))
@@ -106,7 +105,6 @@ object GuessServer extends IOApp {
         sessionIDOpt match {
           case Some(sessionID) =>
             val sessionT = for {
-              sessions <- sessionsIO
               _ <- IO(println(sessions))
               session <- sessions.get(UUID.fromString(sessionID))
             } yield session
@@ -117,20 +115,17 @@ object GuessServer extends IOApp {
                 if (game.tries == 0) BadRequest("You don't have any more tries")
                 else if (game.server < gameGuess.guess) {
                   val putSession = for {
-                    sessions <- sessionsIO
                     _ <- sessions.put(session.copy(game = game.copy(tries = game.tries - 1)))
                   } yield ()
                   putSession *> BadRequest("Number is too large")
                 } else if (game.server < gameGuess.guess) {
                   val putSession = for {
-                    sessions <- sessionsIO
                     _ <- sessions.put(session.copy(game = game.copy(tries = game.tries - 1)))
                   } yield ()
                   putSession *> BadRequest("Number is too small")
                 }
                 else {
                   val putSession = for {
-                    sessions <- sessionsIO
                     _ <- sessions.put(session.copy(game = game.copy(tries = 0)))
                   } yield ()
                   putSession *>  Ok("You won!")
@@ -142,16 +137,20 @@ object GuessServer extends IOApp {
 
   }
 
-  private[http] val httpApp = {
-    gameRoutes
+  private[http] def httpApp(sessions: SessionWarehouse[IO]): Kleisli[IO, Request[IO], Response[IO]] = {
+    gameRoutes(sessions)
   }.orNotFound
 
-  override def run(args: List[String]): IO[ExitCode] =
-    BlazeServerBuilder[IO](ExecutionContext.global)
-      .bindHttp(port = 9001, host = "localhost")
-      .withHttpApp(httpApp)
-      .serve
-      .compile
-      .drain
-      .as(ExitCode.Success)
+  override def run(args: List[String]): IO[ExitCode] = {
+    for {
+      state <- SessionsWarehouse.of[IO]
+      _ <- BlazeServerBuilder[IO](ExecutionContext.global)
+        .bindHttp(port = 9001, host = "localhost")
+        .withHttpApp(httpApp(state))
+        .serve
+        .compile
+        .drain
+        .as(ExitCode.Success)
+    } yield (ExitCode.Success)
+  }
 }
