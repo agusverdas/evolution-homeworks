@@ -21,6 +21,7 @@ object DbCommon {
       |  author UUID NOT NULL,
       |  title VARCHAR(100) NOT NULL,
       |  year INT,
+      |  genre VARCHAR(255) CHECK (genre in ('tutorial', 'fiction')),
       |  FOREIGN KEY (author) REFERENCES authors(id));""".stripMargin
 
   val populateDataSql: String =
@@ -29,14 +30,14 @@ object DbCommon {
        |  ('$authorOdersky', 'Martin Odersky', '1958-09-05'),
        |  ('$authorRowling', 'J.K. Rowling', '1965-07-31');
        |
-       |INSERT INTO books (id, author, title, year) VALUES
-       |  ('$bookScala', '$authorOdersky', 'Programming in Scala', 2016),
-       |  ('$bookHPStone', '$authorRowling', 'Harry Potter and Philosopher''s Stone', 1997),
-       |  ('$bookHPSecrets', '$authorRowling', 'Harry Potter and the Chamber of Secrets', 1998);
+       |INSERT INTO books (id, author, title, year, genre) VALUES
+       |  ('$bookScala', '$authorOdersky', 'Programming in Scala', 2016, 'tutorial'),
+       |  ('$bookHPStone', '$authorRowling', 'Harry Potter and Philosopher''s Stone', 1997, 'fiction'),
+       |  ('$bookHPSecrets', '$authorRowling', 'Harry Potter and the Chamber of Secrets', 1998, 'fiction');
        |""".stripMargin
 
   val fetchBooksCommonSql: String =
-    """SELECT b.id, a.id, a.name, a.birthday, b.title, b.year FROM books b
+    """SELECT b.id, a.id, a.name, a.birthday, b.title, b.year, b.genre FROM books b
       |INNER JOIN authors a ON b.author = a.id """.stripMargin
 
   val fetchHarryPotterBooksSql: String = fetchBooksCommonSql + s"WHERE b.author = '$authorRowling';"

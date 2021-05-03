@@ -33,13 +33,13 @@ object Repository {
     fr"SELECT id, name, birthday FROM authors"
 
   val books: Fragment =
-    fr"SELECT id, author, title, year FROM books"
+    fr"SELECT id, author, title, year, genre FROM books"
 
   def fetchAuthorById(id: UUID): ConnectionIO[Option[Author]] =
     (authors ++ fr"WHERE id = $id").query[Author].option
 
   val fetchBooksAndAuthor: Fragment =
-    fr"""SELECT b.id, a.id, a.name, a.birthday, b.title, b.year FROM books b
+    fr"""SELECT b.id, a.id, a.name, a.birthday, b.title, b.year, b.genre FROM books b
             INNER JOIN authors a ON b.author = a.id"""
 
   def fetchAllBooks: doobie.ConnectionIO[List[Book]] = {
@@ -84,8 +84,8 @@ object Repository {
     selectBooks.query[Book].to[List]
   }
 
-  def insertBook(id: UUID, title: String, authorId: UUID, year: Year): doobie.ConnectionIO[Int] = {
-    val insertBook = fr"INSERT INTO books(id, title, author, year) VALUES ($id, $title, $authorId, $year)"
+  def insertBook(id: UUID, title: String, authorId: UUID, year: Year, genre: Genre): doobie.ConnectionIO[Int] = {
+    val insertBook = fr"INSERT INTO books(id, title, author, year, genre) VALUES ($id, $title, $authorId, $year, $genre)"
     insertBook.update.run
   }
 
@@ -113,7 +113,7 @@ object Repository {
   private def insertBookWithExistingAuthor(authorId: UUID, bookWithAuthor: BookWithAuthorDTO) = {
     for {
       bookId <- UUID.randomUUID().pure[ConnectionIO]
-      bookInsert <- insertBook(bookId, bookWithAuthor.title, authorId, bookWithAuthor.year)
+      bookInsert <- insertBook(bookId, bookWithAuthor.title, authorId, bookWithAuthor.year, bookWithAuthor.genre)
       selectBookWithAuthor <- fetchBookById(bookId).option
     } yield (bookInsert, selectBookWithAuthor)
   }
@@ -132,12 +132,16 @@ object Repository {
             _ <- updateAuthor(author)
           } yield author.id
         }
-        _ <- updateBook(book.copy(authorId = authorId))
+        _ <- updateBook(book.copy(
+          authorId = authorId,
+          title = bookWithAuthor.title,
+          year = bookWithAuthor.year,
+          genre = bookWithAuthor.genre
+        ))
         select <- fetchBookById(book.id).unique
       } yield select
     } yield book
   }
-
 
   private def updateAuthor(author: Author): doobie.ConnectionIO[Int] = {
     val updateAuthor = fr"UPDATE authors SET name = ${author.name}, birthday = ${author.birthday} WHERE id = ${author.id}"
@@ -145,7 +149,7 @@ object Repository {
   }
 
   def updateBook(book: Book): doobie.ConnectionIO[Int] = {
-    val updateBook = fr"UPDATE books SET year = ${book.year}, title = ${book.title}, author = ${book.authorId} WHERE id = ${book.id}"
+    val updateBook = fr"UPDATE books SET year = ${book.year}, title = ${book.title}, author = ${book.authorId}, genre = ${book.genre} WHERE id = ${book.id}"
     updateBook.update.run
   }
 

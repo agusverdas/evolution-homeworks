@@ -1,9 +1,8 @@
 package com.evolution.homework.crud
 
-import cats.data.OptionT
 import cats.effect.{ExitCode, IO, IOApp}
 import cats.implicits.toSemigroupKOps
-import com.evolution.homework.crud.Repository.{ddl1, ddl2, dml, fetchAllAuthors, fetchAllBooks, fetchAllBooksAndAuthors, fetchAuthorById, fetchAuthorByName, fetchBookAndAuthorById, fetchBookById, insertBookWithAuthor, updateBookWithAuthor}
+import com.evolution.homework.crud.Repository.{ddl1, ddl2, dml, fetchAllAuthors, fetchAllBooks, fetchAllBooksAndAuthors, fetchAuthorById, fetchBookAndAuthorById, fetchBookById, insertBookWithAuthor, updateBookWithAuthor}
 import doobie.ConnectionIO
 import doobie.implicits._
 import org.http4s.HttpRoutes
