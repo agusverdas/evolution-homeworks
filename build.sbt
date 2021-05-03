@@ -15,6 +15,7 @@ val catsVersion = "2.2.0"
 val circeVersion = "0.13.0"
 val catsEffectVersion = "2.2.0"
 val http4sVersion = "0.21.22"
+val doobieVersion = "0.9.0"
 
 libraryDependencies ++= Seq(
   "org.typelevel" %% "cats-core" % catsVersion,
@@ -22,6 +23,7 @@ libraryDependencies ++= Seq(
   "org.scalatestplus" %% "scalatestplus-scalacheck" % scalaTestVersion % Test,
   "org.scalatestplus" %% "selenium-2-45" % scalaTestVersion % Test,
   "io.chrisdavenport" %% "cats-scalacheck" % catsScalacheckVersion % Test,
+  "ch.qos.logback" % "logback-classic" % "1.2.3",
   "org.http4s" %% "http4s-dsl" % http4sVersion,
   "org.http4s" %% "http4s-blaze-server" % http4sVersion,
   "org.http4s" %% "http4s-blaze-client" % http4sVersion,
@@ -32,6 +34,10 @@ libraryDependencies ++= Seq(
   "io.circe" %% "circe-generic-extras" % circeVersion,
   "io.circe" %% "circe-optics" % circeVersion,
   "io.circe" %% "circe-parser" % circeVersion,
+  "org.tpolecat" %% "doobie-core" % doobieVersion,
+  "org.tpolecat" %% "doobie-h2" % doobieVersion,
+  "org.tpolecat" %% "doobie-hikari" % doobieVersion,
+  "com.h2database" % "h2" % "1.4.200",
   "org.scalaj" %% "scalaj-http" % "2.4.2" % Test
 )
 
