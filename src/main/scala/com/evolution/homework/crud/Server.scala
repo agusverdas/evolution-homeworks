@@ -102,8 +102,7 @@ object Server extends IOApp {
 
   override def run(args: List[String]): IO[ExitCode] = {
     for {
-      _ <- DbTransactor
-        .make[IO]
+      _ <- transactor
         .use { xa =>
           for {
             _ <- setup().transact(xa)
