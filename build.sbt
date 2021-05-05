@@ -17,6 +17,7 @@ val catsEffectVersion = "2.2.0"
 val http4sVersion = "0.21.22"
 val doobieVersion = "0.9.0"
 val enumeratumVersion = "1.6.1"
+val akkaVersion = "2.6.9"
 
 libraryDependencies ++= Seq(
   "org.typelevel" %% "cats-core" % catsVersion,
@@ -38,10 +39,12 @@ libraryDependencies ++= Seq(
   "org.tpolecat" %% "doobie-core" % doobieVersion,
   "org.tpolecat" %% "doobie-h2" % doobieVersion,
   "org.tpolecat" %% "doobie-hikari" % doobieVersion,
+  "com.typesafe.akka" %% "akka-actor" % akkaVersion,
   "com.beachape" %% "enumeratum" % enumeratumVersion,
   "com.beachape" %% "enumeratum-doobie" % "1.6.0",
   "com.beachape" %% "enumeratum-circe" % enumeratumVersion,
   "com.h2database" % "h2" % "1.4.200",
+  "com.typesafe.akka" %% "akka-testkit" % akkaVersion % Test,
   "org.scalaj" %% "scalaj-http" % "2.4.2" % Test
 )
 
